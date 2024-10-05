@@ -30,11 +30,48 @@ class ATM {
   bool verifyPin(String enteredPin) {
     if (enteredPin == _pinCode) {
       _authenticated = true;
+      _pinAttempts = 0;
       return true;
     } else {
       _pinAttempts++;
       return false;
     }
+  }
+
+  double get balance => _balance;
+
+  void deposit(double amount) {
+    if (amount > 0) {
+      _balance += amount;
+    }
+  }
+
+  bool withdraw(double amount) {
+    if (amount > 0 && amount <= _balance) {
+      _balance -= amount;
+      return true;
+    }
+    return false;
+  }
+
+  bool payBills(double amount) {
+    if (amount > 0 && amount <= _balance) {
+      _balance -= amount;
+      return true;
+    }
+    return false;
+  }
+
+  bool transferMoney(double amount) {
+    if (amount > 0 && amount <= _balance) {
+      _balance -= amount;
+      return true;
+    }
+    return false;
+  }
+
+  void changePin(String newPin) {
+    _pinCode = newPin;
   }
 
   bool get isLocked => _pinAttempts >= 3;
@@ -55,6 +92,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String _message = '';
   bool _isLocked = false;
   bool _showKeypad = false;
+
   void _handleButtonPress(String digit) {
     if (_enteredPin.length < 4) {
       setState(() {
@@ -71,9 +109,12 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       if (_atm.verifyPin(_enteredPin)) {
         _message = 'PIN accepted. Welcome!';
+
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => ATMHomePage()),
+          MaterialPageRoute(
+            builder: (context) => HomeScreen(atm: _atm),
+          ),
         );
       } else {
         _isLocked = _atm.isLocked;
@@ -158,9 +199,9 @@ class _MyHomePageState extends State<MyHomePage> {
                           }
                         },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white, // White background
+                    backgroundColor: Colors.white,
                     side: const BorderSide(
-                      color: Color(0xFF00364D), // Dark blue border
+                      color: Color(0xFF00364D),
                       width: 0,
                     ),
                     fixedSize: const Size(80, 60),
@@ -172,7 +213,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     digit,
                     style: const TextStyle(
                       fontSize: 12,
-                      color: Color(0xFF00364D), // Light blue text
+                      color: Color(0xFF00364D),
                     ),
                   ),
                 ),
